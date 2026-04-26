@@ -1,0 +1,37 @@
+.btn-contact {
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-contact:hover {
+  transform: scale(1.05);
+}
+
+.card {
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+  background: white;
+}
+
+.dark-theme .card {
+  background: #2d3748;
+  box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.my-footer {
+  background-color: #f8f9fa;
+  padding: 20px 0;
+  text-align: center;
+  margin-top: 40px;
+  border-top: 1px solid #dee2e6;
+}
+
+.dark-theme .my-footer {
+  background-color: #2d3748;
+  border-top-color: #4a5568;
+  color: #fff;
+}

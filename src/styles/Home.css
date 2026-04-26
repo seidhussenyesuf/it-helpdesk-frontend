@@ -1,0 +1,47 @@
+/* src/styles/Home.css */
+.hero-section {
+  text-align: center;
+  padding: 3rem 1rem;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo {
+  max-width: 200px;
+  margin-bottom: 1.5rem;
+}
+
+.hero-section h1 {
+  font-size: 2.5rem;
+  color: #007bff;
+  margin-bottom: 0.5rem;
+}
+
+.hero-section h3 {
+  font-size: 1.5rem;
+  color: #6c757d;
+  margin-bottom: 1rem;
+}
+
+.hero-section p {
+  font-size: 1.2rem;
+  max-width: 600px;
+  margin-bottom: 2rem;
+  color: #343a40;
+}
+
+.button-group {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.btn-lg {
+  padding: 0.75rem 1.5rem;
+  font-size: 1.25rem;
+}
