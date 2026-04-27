@@ -63,7 +63,11 @@ const ChangePassword = () => {
         });
         
         setTimeout(() => {
-          navigate('/user-dashboard');
+          if (user.role === 'admin' || user.role === 'senior') {
+  navigate('/senior-dashboard');
+} else {
+  navigate('/user-dashboard');
+}
         }, 800);
       }
     } catch (error) {
