@@ -55,21 +55,17 @@ const ChangePassword = () => {
       });
 
       if (response.data.success) {
-        setSuccess('Password changed successfully! Redirecting...');
-        setFormData({
-          current_password: '',
-          new_password: '',
-          confirm_password: ''
-        });
-        
-        setTimeout(() => {
-          if (user.role === 'admin' || user.role === 'senior') {
-  navigate('/senior-dashboard');
-} else {
-  navigate('/user-dashboard');
+  setSuccessMessage('Password changed successfully!');
+  setTimeout(() => {
+    if (user.role === 'admin') {
+      navigate('/admin-dashboard');
+    } else if (user.role === 'senior') {
+      navigate('/senior-dashboard');
+    } else {
+      navigate('/user-dashboard');
+    }
+  }, 1500);
 }
-        }, 800);
-      }
     } catch (error) {
       console.error('Change password error:', error);
       if (error.response && error.response.data) {
