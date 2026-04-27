@@ -18,14 +18,17 @@ const Profile = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (user.id) {
+    if (user.user_id || user.id) {
       setFormData({
         name: user.name || '',
         email: user.email || '',
         phone_number: user.phone_number || '',
         team_id: user.team_id || ''
       });
-      setAvatarPreview(user.avatar_path || '/assets/default_avatar.png');
+      const avatarUrl = user.avatar_path 
+  ? `https://it-helpdesk-backend-z8a1.onrender.com/${user.avatar_path}`
+  : '/assets/default_avatar.png';
+setAvatarPreview(avatarUrl);
     }
   }, [user]);
 
@@ -71,7 +74,7 @@ const Profile = () => {
 
     try {
       // FIXED: Correct API endpoint with /api prefix
-      const response = await axiosInstance.put(`/api/profile/${user.id}`, submitData, {
+      const response = await axiosInstance.put(`/api/profile/${user.user_id || user.id}`, submitData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
