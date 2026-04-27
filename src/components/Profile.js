@@ -4,12 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 const Profile = () => {
   const { user, setUser, theme } = useContext(UserContext);
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone_number: '',
-    team_id: ''
-  });
+  const [formData, setFormData] = useState({ name: '', email: '', phone_number: '' });
   const [avatar, setAvatar] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
@@ -22,21 +17,17 @@ const Profile = () => {
       setFormData({
         name: user.name || '',
         email: user.email || '',
-        phone_number: user.phone_number || '',
-        team_id: user.team_id || ''
+        phone_number: user.phone_number || ''
       });
-      const avatarUrl = user.avatar_path 
-  ? `https://it-helpdesk-backend-z8a1.onrender.com/${user.avatar_path}`
-  : '/assets/default_avatar.png';
-setAvatarPreview(avatarUrl);
+      // Show avatar if exists
+      if (user.avatar_path) {
+        setAvatarPreview('https://it-helpdesk-backend-z8a1.onrender.com/' + user.avatar_path);
+      }
     }
   }, [user]);
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleFileChange = (e) => {
@@ -44,172 +35,77 @@ setAvatarPreview(avatarUrl);
     if (file) {
       setAvatar(file);
       const reader = new FileReader();
-      reader.onload = (e) => {
-        setAvatarPreview(e.target.result);
-      };
+      reader.onload = (event) => setAvatarPreview(event.target.result);
       reader.readAsDataURL(file);
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setSuccessMessage('');
-    setErrorMessage('');
     setIsSubmitting(true);
-
-    if (!formData.name || !formData.email) {
-      setErrorMessage('Name and email are required');
-      setIsSubmitting(false);
-      return;
-    }
 
     const submitData = new FormData();
     submitData.append('name', formData.name);
     submitData.append('email', formData.email);
-    if (formData.phone_number) submitData.append('phone_number', formData.phone_number);
-    if (formData.team_id && (user.role === 'admin' || user.role === 'senior')) {
-      submitData.append('team_id', formData.team_id);
-    }
+    submitData.append('phone_number', formData.phone_number || '');
     if (avatar) submitData.append('avatar', avatar);
 
     try {
-      // FIXED: Correct API endpoint with /api prefix
-      const response = await axiosInstance.put(`/api/profile/${user.user_id || user.id}`, submitData, {
+      const uid = user.user_id || user.id;
+      const response = await axiosInstance.put('/api/profile/' + uid, submitData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
       if (response.data.success) {
-        setSuccessMessage('Profile updated successfully! Redirecting...');
-        
-        // FIXED: Full user update including avatar_path
-        const updatedUser = {
-          ...user,
-          ...response.data.user,
-          avatar_path: response.data.user.avatar_path || user.avatar_path
-        };
-        setUser(updatedUser);
-        localStorage.setItem('user', JSON.stringify(updatedUser));
-
-        setTimeout(() => {
-          if (user.role === 'admin') navigate('/admin-register-senior');
-          else if (user.role === 'senior') navigate('/dashboard');
-          else navigate('/user-dashboard');
-        }, 800);
+        setSuccessMessage('✅ Profile updated!');
+        setUser({ ...user, ...response.data.user });
+        localStorage.setItem('user', JSON.stringify({ ...user, ...response.data.user }));
+        setTimeout(() => navigate(-1), 1000);
       }
     } catch (error) {
-      console.error('Profile update error:', error);
-      setErrorMessage(error.response?.data?.message || 'Failed to update profile');
+      setErrorMessage(error.response?.data?.message || 'Update failed');
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className={`min-vh-100 d-flex flex-column ${theme === 'dark' ? 'bg-dark text-light' : 'bg-light text-dark'}`}>
-      <style>
-        {`
-          .card { background-color: ${theme === 'dark' ? '#1a202c' : '#fff'}; color: ${theme === 'dark' ? '#e2e8f0' : '#000'}; border-color: ${theme === 'dark' ? '#2d3748' : '#dee2e6'}; }
-          .form-control { background-color: ${theme === 'dark' ? '#2d3748' : '#fff'}; color: ${theme === 'dark' ? '#e2e8f0' : '#000'}; border-color: ${theme === 'dark' ? '#4a5568' : '#ced4da'}; }
-          .form-control:focus { border-color: #0d6efd; box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25); }
-          .form-label { color: ${theme === 'dark' ? '#e2e8f0' : '#000'}; }
-          .alert-success { color: ${theme === 'dark' ? '#c6f6d5' : '#155724'}; }
-          .alert-danger { color: ${theme === 'dark' ? '#fed7d7' : '#721c24'}; }
-          .btn-primary { background-color: ${theme === 'dark' ? '#2b6cb0' : '#007bff'}; border-color: ${theme === 'dark' ? '#2b6cb0' : '#007bff'}; }
-          .btn-primary:hover { background-color: ${theme === 'dark' ? '#2c5282' : '#0056b3'}; }
-          .btn-close { filter: ${theme === 'dark' ? 'invert(1)' : 'none'}; }
-        `}
-      </style>
+    <div className={`container mt-5 ${theme === 'dark' ? 'text-light' : ''}`}>
+      <div className="card p-4" style={{ background: theme === 'dark' ? '#1a202c' : '#fff', maxWidth: 500, margin: '0 auto' }}>
+        <h2 className="mb-4 text-center">Profile</h2>
+        
+        {successMessage && <div className="alert alert-success">{successMessage}</div>}
+        {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
 
-      <div className="container mt-5 flex-grow-1">
-        <div id="flashMessageContainer">
-          {successMessage && (
-            <div className="alert alert-success alert-dismissible fade show" role="alert">
-              {successMessage}
-              <button type="button" className="btn-close" onClick={() => setSuccessMessage('')}></button>
-            </div>
-          )}
-          {errorMessage && (
-            <div className="alert alert-danger alert-dismissible fade show" role="alert">
-              {errorMessage}
-              <button type="button" className="btn-close" onClick={() => setErrorMessage('')}></button>
-            </div>
-          )}
-        </div>
+        <form onSubmit={handleSubmit}>
+          <div className="text-center mb-4">
+            <img 
+              src={avatarPreview || 'https://via.placeholder.com/150'} 
+              alt="Avatar" 
+              style={{ width: 150, height: 150, borderRadius: '50%', objectFit: 'cover', border: '3px solid #ddd' }}
+              onError={(e) => { e.target.src = 'https://via.placeholder.com/150'; }}
+            />
+            <br />
+            <input type="file" accept="image/*" onChange={handleFileChange} className="mt-2" />
+          </div>
 
-        <div className="card p-4">
-          <h2 className="mb-4 text-center">Profile Management</h2>
-          <form onSubmit={handleSubmit} encType="multipart/form-data" className="needs-validation" noValidate>
-            <div className="mb-4 d-flex justify-content-center align-items-center flex-column">
-              <img 
-  src={avatarPreview || 'https://via.placeholder.com/200'} 
-  alt="Profile Avatar" 
-  onError={(e) => { e.target.src = 'https://via.placeholder.com/200'; }}
-                className="avatar-preview mb-3"
-                style={{
-                  width: '200px',
-                  height: '200px',
-                  borderRadius: '50%',
-                  objectFit: 'cover',
-                  border: '3px solid #dee2e6',
-                  boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
-                  transition: 'transform 0.2s ease'
-                }}
-                onMouseOver={(e) => e.target.style.transform = 'scale(1.05)'}
-                onMouseOut={(e) => e.target.style.transform = 'scale(1)'}
-              />
-              <label htmlFor="avatar" className="form-label">Update Profile Photo</label>
-              <input 
-                type="file" 
-                name="avatar" 
-                id="avatar" 
-                className="form-control w-50 text-center" 
-                accept="image/jpeg,image/png,image/gif"
-                onChange={handleFileChange}
-                disabled={isSubmitting}
-              />
-            </div>
-
-            <div className="mb-3">
-              <label htmlFor="name" className="form-label">Full Name</label>
-              <input type="text" name="name" id="name" className="form-control" value={formData.name} onChange={handleChange} required disabled={isSubmitting} />
-              <div className="invalid-feedback">Please provide your name.</div>
-            </div>
-
-            <div className="mb-3">
-              <label htmlFor="email" className="form-label">Email</label>
-              <input type="email" name="email" id="email" className="form-control" value={formData.email} onChange={handleChange} required disabled={isSubmitting} />
-              <div className="invalid-feedback">Please provide a valid email.</div>
-            </div>
-
-            <div className="mb-3">
-              <label htmlFor="phone_number" className="form-label">Phone Number</label>
-              <input type="tel" name="phone_number" id="phone_number" className="form-control" value={formData.phone_number} onChange={handleChange} disabled={isSubmitting} />
-            </div>
-
-            <div className="mb-3">
-              <label htmlFor="role" className="form-label">Role</label>
-              <input type="text" id="role" className="form-control" value={user.role || ''} disabled />
-            </div>
-
-            {user.team_id && (
-              <div className="mb-3">
-                <label htmlFor="team" className="form-label">Team</label>
-                <input type="text" id="team" className="form-control" value={`Team ID: ${user.team_id}`} disabled />
-              </div>
-            )}
-
-            <div className="d-grid">
-              <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
-                {isSubmitting ? 'Updating...' : 'Update Profile'}
-              </button>
-            </div>
-          </form>
-        </div>
+          <div className="mb-3">
+            <label>Name</label>
+            <input type="text" name="name" className="form-control" value={formData.name} onChange={handleChange} required />
+          </div>
+          <div className="mb-3">
+            <label>Email</label>
+            <input type="email" name="email" className="form-control" value={formData.email} onChange={handleChange} required />
+          </div>
+          <div className="mb-3">
+            <label>Phone</label>
+            <input type="text" name="phone_number" className="form-control" value={formData.phone_number} onChange={handleChange} />
+          </div>
+          <button type="submit" className="btn btn-primary w-100" disabled={isSubmitting}>
+            {isSubmitting ? 'Saving...' : 'Update Profile'}
+          </button>
+        </form>
       </div>
-
-      <footer className={`text-center py-3 ${theme === 'dark' ? 'bg-dark text-light' : 'bg-light text-dark'} mt-auto`}>
-        <p className="mb-0">&copy; {new Date().getFullYear()} Ethiopian Statistical Service. All rights reserved.</p>
-      </footer>
     </div>
   );
 };
