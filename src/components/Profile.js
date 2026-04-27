@@ -141,8 +141,9 @@ setAvatarPreview(avatarUrl);
           <form onSubmit={handleSubmit} encType="multipart/form-data" className="needs-validation" noValidate>
             <div className="mb-4 d-flex justify-content-center align-items-center flex-column">
               <img 
-                src={avatarPreview} 
-                alt="Profile Avatar" 
+  src={avatarPreview || 'https://via.placeholder.com/200'} 
+  alt="Profile Avatar" 
+  onError={(e) => { e.target.src = 'https://via.placeholder.com/200'; }}
                 className="avatar-preview mb-3"
                 style={{
                   width: '200px',

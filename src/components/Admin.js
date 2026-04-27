@@ -52,6 +52,7 @@ const Admin = () => {
   });
   const [sortConfig, setSortConfig] = useState({ key: 'created_at', direction: 'desc' });
   const { user, theme } = useContext(UserContext);
+  const userId = user.user_id || user.id;
   const navigate = useNavigate();
 
   const [editingTicket, setEditingTicket] = useState(null);
