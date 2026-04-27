@@ -48,11 +48,11 @@ const ChangePassword = () => {
     try {
       // FIXED: Correct API endpoint with /api prefix
       const response = await axiosInstance.put('/api/change-password', {
-        current_password: formData.current_password,
-        new_password: formData.new_password,
-        confirm_password: formData.confirm_password,
-        user_id: user.id  // CRITICAL: Must send user_id
-      });
+  user_id: user.id || user.user_id,
+  current_password: formData.currentPassword,
+  new_password: formData.newPassword,
+  confirm_password: formData.confirmPassword
+});
 
       if (response.data.success) {
   setSuccessMessage('Password changed successfully!');
