@@ -18,18 +18,19 @@ const Profile = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (user && user.id) {
+    if (user.id) {
       setFormData({
         name: user.name || '',
         email: user.email || '',
         phone_number: user.phone_number || '',
         team_id: user.team_id || ''
       });
-      // Set avatar preview from existing user data
-      const avatarUrl = user.avatar_path 
-        ? `http://localhost:5000/${user.avatar_path}` 
-        : '/assets/default_avatar.png';
-      setAvatarPreview(avatarUrl);
+      const backendUrl = 'https://it-helpdesk-backend-z8a1.onrender.com';
+if (user.avatar_path) {
+  setAvatarPreview(backendUrl + '/' + user.avatar_path);
+} else {
+  setAvatarPreview(backendUrl + '/assets/default_avatar.png');
+}
     }
   }, [user]);
 
@@ -74,39 +75,28 @@ const Profile = () => {
     if (avatar) submitData.append('avatar', avatar);
 
     try {
+      // FIXED: Correct API endpoint with /api prefix
       const response = await axiosInstance.put(`/api/profile/${user.id}`, submitData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
-      console.log('Profile update response:', response.data);
-
       if (response.data.success) {
-        // IMPORTANT: Get the updated user from response
-        const updatedUserFromServer = response.data.user;
+        setSuccessMessage('Profile updated successfully! Redirecting...');
         
-        console.log('Updated user from server:', updatedUserFromServer);
-        console.log('New avatar_path:', updatedUserFromServer.avatar_path);
-        
-        // Merge the updated user data with current user
+        // FIXED: Full user update including avatar_path
         const updatedUser = {
           ...user,
-          ...updatedUserFromServer
+          ...response.data.user,
+          avatar_path: response.data.user.avatar_path || user.avatar_path
         };
-        
-        // Update context
         setUser(updatedUser);
-        
-        // Update localStorage
         localStorage.setItem('user', JSON.stringify(updatedUser));
-        
-        setSuccessMessage('Profile updated successfully! Redirecting...');
 
-        // Wait a moment then redirect
         setTimeout(() => {
           if (user.role === 'admin') navigate('/admin-register-senior');
           else if (user.role === 'senior') navigate('/dashboard');
           else navigate('/user-dashboard');
-        }, 1500);
+        }, 800);
       }
     } catch (error) {
       console.error('Profile update error:', error);
@@ -153,8 +143,9 @@ const Profile = () => {
           <form onSubmit={handleSubmit} encType="multipart/form-data" className="needs-validation" noValidate>
             <div className="mb-4 d-flex justify-content-center align-items-center flex-column">
               <img 
-                src={avatarPreview} 
-                alt="Profile Avatar" 
+  src={avatarPreview || 'https://via.placeholder.com/200'} 
+  alt="Profile Avatar" 
+  onError={(e) => { e.target.src = 'https://via.placeholder.com/200'; }}
                 className="avatar-preview mb-3"
                 style={{
                   width: '200px',
@@ -178,7 +169,6 @@ const Profile = () => {
                 onChange={handleFileChange}
                 disabled={isSubmitting}
               />
-              <small className="text-muted mt-2">Max file size: 5MB. Allowed formats: JPG, PNG, GIF</small>
             </div>
 
             <div className="mb-3">
@@ -210,7 +200,7 @@ const Profile = () => {
               </div>
             )}
 
-            <div className="d-grid gap-2">
+            <div className="d-grid">
               <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
                 {isSubmitting ? 'Updating...' : 'Update Profile'}
               </button>
