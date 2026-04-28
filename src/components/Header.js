@@ -128,7 +128,7 @@ const Header = () => {
                   {/* Avatar - Use user.avatar_path directly from context */}
                   {user.avatar_path ? (
                     <img 
-                      src={`http://localhost:5000/${user.avatar_path}`} 
+  src={user.avatar_path ? `https://it-helpdesk-backend-z8a1.onrender.com/${user.avatar_path}` : ''} 
                       alt="Avatar" 
                       className="rounded-circle me-2"
                       style={{ 
@@ -151,7 +151,7 @@ const Header = () => {
                     className="fas fa-user-circle me-2" 
                     style={{ 
                       fontSize: '1.5rem',
-                      display: user.avatar_path ? 'none' : 'inline',
+                      display: user.avatar_path ? 'none' : 'inline-block',
                       transition: 'transform 0.3s ease'
                     }}
                     onMouseEnter={(e) => {
