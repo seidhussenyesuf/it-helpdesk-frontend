@@ -11,8 +11,16 @@ const Header = () => {
   const timeoutRef = useRef(null); // Add this ref for timeout
 
   useEffect(() => {
-    // Use the user from context directly, no need to fetch separately
-    if (user.id) {
+    // Get latest user data from localStorage on every render
+    const savedUser = localStorage.getItem('user');
+    if (savedUser) {
+      try {
+        const parsed = JSON.parse(savedUser);
+        setUserProfile(parsed);
+      } catch (e) {
+        setUserProfile(user);
+      }
+    } else if (user.id || user.user_id) {
       setUserProfile(user);
     }
   }, [user]);
@@ -126,9 +134,9 @@ const Header = () => {
                   }}
                 >
                   {/* Avatar - Use user.avatar_path directly from context */}
-                  {user.avatar_path ? (
-                    <img 
-  src={user.avatar_path ? `https://it-helpdesk-backend-z8a1.onrender.com/${user.avatar_path}` : ''} 
+                  {(userProfile?.avatar_path || user?.avatar_path) ? (
+  <img 
+    src={`https://it-helpdesk-backend-z8a1.onrender.com/${userProfile?.avatar_path || user?.avatar_path}`} 
                       alt="Avatar" 
                       className="rounded-circle me-2"
                       style={{ 
