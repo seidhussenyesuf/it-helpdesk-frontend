@@ -312,10 +312,15 @@ const Admin = () => {
         setErrorMessage('Passwords do not match');
         return;
       }
-      if (formData.password.length < 6) {
-        setErrorMessage('Password must be at least 6 characters');
-        return;
-      }
+// FIXED code
+if (formData.password.length < 8) {
+  setErrorMessage('Password must be at least 8 characters');
+  return;
+}
+if (formData.password.length > 20) {
+  setErrorMessage('Password cannot exceed 20 characters');
+  return;
+}
       if (formData.role === 'senior' && !formData.team_id) {
         setErrorMessage('Team is required for senior officers');
         return;
@@ -924,10 +929,11 @@ const handleDeleteUser = async (userId) => {
                       </select>
                     </div>
                   )}
-                  <div className="mb-3">
-                    <label className="form-label">Password {!editUser && '*'}</label>
-                    <input type="password" name="password" value={formData.password} onChange={handleUserFormChange} className="form-control" required={!editUser} minLength="6" />
-                  </div>
+                  // FIXED code
+<div className="mb-3">
+  <label className="form-label">Password {!editUser && '*'}</label>
+  <input type="password" name="password" value={formData.password} onChange={handleUserFormChange} className="form-control" required={!editUser} minLength="8" maxLength="20" />
+</div>
                   <div className="mb-3">
                     <label className="form-label">Confirm Password {!editUser && '*'}</label>
                     <input type="password" name="confirm_password" value={formData.confirm_password} onChange={handleUserFormChange} className="form-control" required={!editUser} />

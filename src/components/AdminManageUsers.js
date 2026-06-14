@@ -166,8 +166,10 @@ const AdminManageUsers = () => {
     if (!editUser) {
       if (!formData.password) {
         errors.password = 'Password is required';
-      } else if (formData.password.length < 6) {
-        errors.password = 'Password must be at least 6 characters';
+      } else if (formData.password.length < 8) {
+        errors.password = 'Password must be at least 8 characters';
+      } else if (formData.password.length > 20) {
+        errors.password = 'Password cannot exceed 20 characters';
       }
       
       if (!formData.confirm_password) {
@@ -972,14 +974,16 @@ const AdminManageUsers = () => {
                       <label className={`form-label ${!editUser ? 'required' : ''}`}>
                         Password {editUser ? '(Leave blank to keep current)' : ''}
                       </label>
-                      <input
-                        type="password"
-                        name="password"
-                        className={`form-control ${formErrors.password ? 'is-invalid' : ''}`}
-                        value={formData.password}
-                        onChange={handleUserFormChange}
-                        minLength="6"
-                      />
+                      // FIXED code
+<input
+  type="password"
+  name="password"
+  className={`form-control ${formErrors.password ? 'is-invalid' : ''}`}
+  value={formData.password}
+  onChange={handleUserFormChange}
+  minLength="8"
+  maxLength="20"
+/>
                       {formErrors.password && <div className="error-message">{formErrors.password}</div>}
                     </div>
                     <div className="col-md-6 mb-3">

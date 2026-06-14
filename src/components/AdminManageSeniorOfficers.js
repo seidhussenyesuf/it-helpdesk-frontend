@@ -302,11 +302,15 @@ const AdminManageSeniorOfficers = () => {
       setErrorMessage('የይለፍ ቃላቶች አይዛመዱም / Passwords do not match');
       return;
     }
-    if (formData.password.length < 6) {
-      setErrorMessage('የይለፍ ቃል ቢያንስ 6 ቁምፊዎች መሆን አለበት / Password must be at least 6 characters');
-      return;
-    }
-    
+    // FIXED code
+if (formData.password.length < 8) {
+  setErrorMessage('የይለፍ ቃል ቢያንስ 8 ቁምፊዎች መሆን አለበት / Password must be at least 8 characters');
+  return;
+}
+if (formData.password.length > 20) {
+  setErrorMessage('የይለፍ ቃል ከ20 ቁምፊዎች መብለጥ አይችልም / Password cannot exceed 20 characters');
+  return;
+}
     if (!validatePhoneNumber()) {
       return;
     }
@@ -1034,16 +1038,18 @@ const AdminManageSeniorOfficers = () => {
                     <div className="col-md-6">
                       <div className="mb-3">
                         <label className="form-label">Password *</label>
-                        <input
-                          type="password"
-                          name="password"
-                          value={formData.password}
-                          onChange={handleFormChange}
-                          className={`form-control ${theme === 'dark' ? 'bg-dark text-light border-secondary' : ''}`}
-                          required
-                          disabled={loading}
-                          minLength="6"
-                        />
+                        // FIXED code
+<input
+  type="password"
+  name="password"
+  value={formData.password}
+  onChange={handleFormChange}
+  className={`form-control ${theme === 'dark' ? 'bg-dark text-light border-secondary' : ''}`}
+  required
+  disabled={loading}
+  minLength="8"
+  maxLength="20"
+/>
                         <small className="text-muted">Minimum 6 characters</small>
                       </div>
                     </div>
